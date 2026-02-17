@@ -7,58 +7,84 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #0288d1; --dark: #01579b; --light: #e1f5fe; --border: #cfd8dc; --white: #ffffff; }
-        body { background: #f5f7fa; font-family: 'Segoe UI', sans-serif; color: #333; margin: 0; padding: 20px; }
+        * { box-sizing: border-box; }
+        body { background: #f5f7fa; font-family: 'Segoe UI', sans-serif; color: #333; margin: 0; padding: 10px; }
         
-        .invoice-box { max-width: 800px; margin: auto; padding: 40px; border: 1px solid #eee; background: white; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); font-size: 16px; line-height: 24px; }
-        .header { display: flex; justify-content: space-between; align-items: start; border-bottom: 2px solid var(--primary); padding-bottom: 20px; margin-bottom: 20px; }
-        .logo h1 { margin: 0; color: var(--dark); font-size: 26px; text-transform: uppercase; }
+        .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; background: white; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); font-size: 16px; line-height: 24px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--primary); padding-bottom: 20px; margin-bottom: 20px; }
+        .logo h1 { margin: 0; color: var(--dark); font-size: 24px; text-transform: uppercase; }
         .logo span { color: var(--primary); }
         .logo p { margin: 2px 0; font-size: 13px; color: #555; }
         .msme-badge { display: inline-block; background: var(--dark); color: white; padding: 4px 10px; font-size: 11px; border-radius: 4px; margin-top: 5px; font-weight: bold; }
         
         .invoice-title { text-align: right; }
         .invoice-title h2 { margin: 0; color: var(--primary); font-size: 32px; letter-spacing: 1px;}
-        input[type="text"], input[type="number"], input[type="date"], textarea { border: 1px dashed #ccc; padding: 5px; font-family: inherit; color: #333; background: #fafafa; }
+        input[type="text"], input[type="number"], input[type="date"], textarea { border: 1px dashed #ccc; padding: 8px; font-family: inherit; color: #333; background: #fafafa; border-radius: 4px;}
         input:focus, textarea:focus { outline: none; border: 1px solid var(--primary); background: #fff; }
 
-        .invoice-meta { margin-top: 10px; text-align: right; }
-        .invoice-meta input { text-align: right; width: 120px; }
+        .invoice-meta { margin-top: 10px; text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 5px;}
+        .invoice-meta input { text-align: right; width: 140px; }
 
         .details-row { display: flex; justify-content: space-between; margin-bottom: 30px; gap: 20px; }
-        .bill-to, .ship-to { flex: 1; }
+        .client-inputs { flex: 1; }
         .label { font-size: 12px; font-weight: bold; color: var(--dark); text-transform: uppercase; margin-bottom: 5px; display: block;}
         .client-inputs input, .client-inputs textarea { width: 100%; margin-bottom: 5px; border: none; border-bottom: 1px dashed #ccc; background: transparent; }
 
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .table-responsive { overflow-x: auto; margin-bottom: 20px; }
+        table { width: 100%; min-width: 650px; border-collapse: collapse; }
         th { background: var(--dark); color: white; padding: 12px 10px; text-align: left; font-size: 13px; text-transform: uppercase; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
-        td input { width: 100%; border: none; background: transparent; font-size: 14px; }
+        td input { width: 100%; border: none; background: transparent; font-size: 14px; padding: 5px;}
         .amount-col { text-align: right; font-weight: bold; }
         .qty-col input, .rate-col input { width: 70px; text-align: center; background: #f9f9f9; border-radius: 4px;}
 
-        .totals { float: right; width: 300px; text-align: right; }
+        .totals-container { display: flex; justify-content: flex-end; }
+        .totals { width: 100%; max-width: 300px; text-align: right; }
         .total-row { padding: 5px 0; border-bottom: 1px solid #eee; }
         .grand-total { font-size: 22px; font-weight: bold; color: var(--dark); border-top: 2px solid var(--dark); margin-top: 5px; padding-top: 10px; background: var(--light); padding: 10px; }
 
-        .footer-section { margin-top: 180px; font-size: 12px; color: #555; display: flex; justify-content: space-between; align-items: end; border-top: 1px solid #eee; padding-top: 20px; }
-        .bank-details { border: 1px solid var(--border); padding: 10px; border-radius: 5px; width: 50%; }
-        .signature { text-align: right; width: 40%; }
+        .footer-section { margin-top: 60px; font-size: 12px; color: #555; display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #eee; padding-top: 20px; gap: 20px;}
+        .bank-details { border: 1px solid var(--border); padding: 15px; border-radius: 5px; flex: 1; }
+        .bank-details input { width: 100%; max-width: 150px; padding: 2px; }
+        .signature { text-align: right; flex: 1; min-width: 200px;}
         .signature-line { border-top: 1px solid #333; margin-top: 40px; width: 100%; display: block; }
 
-        .controls { max-width: 800px; margin: 0 auto 20px auto; text-align: right; display: flex; gap: 10px; justify-content: flex-end; }
-        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .controls { max-width: 800px; margin: 0 auto 20px auto; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+        .btn { padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; flex: 1; min-width: 150px; }
         .btn-add { background: var(--light); color: var(--dark); }
         .btn-print { background: var(--primary); color: white; }
-        .btn-delete { color: red; background: none; cursor: pointer; font-size: 14px;}
+        .btn-delete { color: red; background: none; cursor: pointer; font-size: 16px; padding: 5px;}
 
+        /* MOBILE RESPONSIVE RULES */
+        @media (max-width: 600px) {
+            .invoice-box { padding: 15px; }
+            .header { flex-direction: column; gap: 15px; }
+            .invoice-title { text-align: left; width: 100%; }
+            .invoice-meta { align-items: flex-start; text-align: left; }
+            .invoice-meta input { text-align: left; }
+            .details-row { flex-direction: column; gap: 20px; }
+            .footer-section { flex-direction: column; align-items: stretch; }
+            .bank-details, .signature { text-align: left; }
+            .controls { flex-direction: column; }
+        }
+
+        /* PRINT RULES (Forces Desktop Layout for PDF) */
         @media print {
             body { background: white; margin: 0; padding: 0; }
-            .invoice-box { box-shadow: none; border: none; padding: 0; width: 100%; }
+            .invoice-box { box-shadow: none; border: none; padding: 0; width: 100%; max-width: 100%; }
             .controls, .btn-delete { display: none !important; }
             input, textarea { border: none !important; background: transparent !important; resize: none; padding: 0; }
             .qty-col input, .rate-col input { text-align: center; }
             th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .grand-total, .msme-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .table-responsive { overflow: visible; }
+            .header { flex-direction: row; }
+            .invoice-title { text-align: right; }
+            .invoice-meta { align-items: flex-end; text-align: right; }
+            .invoice-meta input { text-align: right; }
+            .details-row { flex-direction: row; }
+            .footer-section { flex-direction: row; align-items: flex-end; }
+            .signature { text-align: right; }
         }
     </style>
 </head>
@@ -88,63 +114,67 @@
         </div>
 
         <div class="details-row">
-            <div class="bill-to client-inputs">
+            <div class="client-inputs">
                 <span class="label">Bill To:</span>
                 <input type="text" placeholder="Client / Company Name" style="font-weight: bold; font-size: 16px;">
                 <textarea placeholder="Address Line 1" rows="1"></textarea>
                 <textarea placeholder="City, State, Zip" rows="1"></textarea>
                 <input type="text" placeholder="Client GSTIN (Optional)">
             </div>
-            <div class="ship-to client-inputs">
+            <div class="client-inputs">
                 <span class="label">Ship To (If different):</span>
                 <textarea placeholder="Site Address / Delivery Location" rows="3"></textarea>
             </div>
         </div>
 
-        <table id="itemTable">
-            <thead>
-                <tr>
-                    <th style="width: 45%;">Description</th>
-                    <th style="width: 15%;">HSN/SAC</th>
-                    <th style="width: 10%;">Qty</th>
-                    <th style="width: 15%;">Rate (₹)</th>
-                    <th style="width: 15%; text-align: right;">Amount</th>
-                    <th style="width: 5%;"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><input type="text" placeholder="Item Name / Description"></td>
-                    <td><input type="text" placeholder="7604"></td>
-                    <td class="qty-col"><input type="number" value="1" oninput="calculateTotal()"></td>
-                    <td class="rate-col"><input type="number" value="0" oninput="calculateTotal()"></td>
-                    <td class="amount-col">0.00</td>
-                    <td><button class="btn-delete" onclick="deleteRow(this)"><i class="fas fa-trash"></i></button></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="itemTable">
+                <thead>
+                    <tr>
+                        <th style="width: 45%;">Description</th>
+                        <th style="width: 15%;">HSN/SAC</th>
+                        <th style="width: 10%;">Qty</th>
+                        <th style="width: 15%;">Rate (₹)</th>
+                        <th style="width: 15%; text-align: right;">Amount</th>
+                        <th style="width: 5%;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" placeholder="Item Name / Description"></td>
+                        <td><input type="text" placeholder="7604"></td>
+                        <td class="qty-col"><input type="number" value="1" oninput="calculateTotal()"></td>
+                        <td class="rate-col"><input type="number" value="0" oninput="calculateTotal()"></td>
+                        <td class="amount-col">0.00</td>
+                        <td><button class="btn-delete" onclick="deleteRow(this)"><i class="fas fa-trash"></i></button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-        <div class="totals">
-            <div class="total-row">Subtotal: <span id="subtotal">0.00</span></div>
-            <div class="total-row">
-                GST (<input type="number" value="18" style="width:30px; text-align:center;" oninput="calculateTotal()">%): 
-                <span id="gst">0.00</span>
+        <div class="totals-container">
+            <div class="totals">
+                <div class="total-row">Subtotal: <span id="subtotal">0.00</span></div>
+                <div class="total-row">
+                    GST (<input type="number" value="18" style="width:40px; text-align:center; padding: 2px;" oninput="calculateTotal()">%): 
+                    <span id="gst">0.00</span>
+                </div>
+                <div class="total-row grand-total">Total: ₹ <span id="grandTotal">0.00</span></div>
+                <p style="font-size: 11px; font-style: italic;">(Amounts in INR)</p>
             </div>
-            <div class="total-row grand-total">Total: ₹ <span id="grandTotal">0.00</span></div>
-            <p style="font-size: 11px; font-style: italic;">(Amounts in INR)</p>
         </div>
 
         <div class="footer-section">
             <div class="bank-details">
                 <span class="label" style="margin-bottom:5px;">Bank Details for NEFT/RTGS:</span>
-                <strong>Bank Name:</strong> <input type="text" placeholder="Your Bank" style="width:100px; border:none; font-weight:bold;"><br>
+                <strong>Bank:</strong> <input type="text" placeholder="Your Bank" style="border:none; font-weight:bold;"><br>
                 <strong>A/c Name:</strong> Shree Ashtavinayak Glass & Profile<br>
-                <strong>A/c No:</strong> <input type="text" placeholder="XXXXXXXXXXXX" style="width:150px; border:none;"><br>
-                <strong>IFSC Code:</strong> <input type="text" placeholder="XXXX000XXXX" style="width:100px; border:none;">
+                <strong>A/c No:</strong> <input type="text" placeholder="XXXXXXXXXXXX" style="border:none;"><br>
+                <strong>IFSC Code:</strong> <input type="text" placeholder="XXXX000XXXX" style="border:none;">
             </div>
             
             <div class="signature">
-                <p>For, Shree Ashtavinayak Glass & Profile</p>
+                <p style="margin: 0; font-weight: bold;">For, Shree Ashtavinayak Glass & Profile</p>
                 <br><br>
                 <span class="signature-line"></span>
                 <span style="font-size: 12px;">Authorized Signatory</span>
