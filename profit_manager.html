@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Cost Manager | Cloud Sync</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #0288d1; --dark: #01579b; --bg: #f3f4f6; --white: #ffffff; --green: #10b981; --red: #ef4444; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); margin: 0; padding: 20px; color: #333; }
+
+        .header { background: var(--white); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid var(--primary); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .header h1 { margin: 0; color: var(--dark); font-size: 24px; }
+        .cloud-badge { background: #e8f5e9; color: var(--green); padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+
+        .input-container { background: var(--white); padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .billed-input input { background-color: #e0f2fe; font-weight: bold; color: var(--dark); }
+        
+        .btn-calc { grid-column: 1 / -1; background: var(--dark); color: white; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s;}
+        .btn-calc:hover { background: var(--primary); }
+        .btn-calc:disabled { background: #aaa; cursor: not-allowed; }
+
+        .project-list { display: grid; gap: 20px; }
+        .project-card { background: var(--white); padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; border-left: 5px solid var(--green); }
+        .p-info h4 { margin: 0 0 5px 0; font-size: 18px; color: var(--dark); }
+        .stat-box { text-align: center; margin-left: 20px;}
+        .stat-box label { font-size: 11px; color: #777; display: block; }
+        .stat-box div { font-weight: bold; font-size: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>Project Profit Manager</h1>
+            <p style="margin:0; color:#666; font-size:14px;">Post final site calculations directly to Google Sheets</p>
+        </div>
+        <div class="cloud-badge"><i class="fas fa-cloud-upload-alt"></i> Database Live</div>
+    </div>
+
+    <div class="input-container">
+        <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">Add Completed Project</h3>
+        <div class="form-grid">
+            <div class="form-group" style="grid-column: span 2;"><label>Project Name / Client</label><input type="text" id="pName" placeholder="e.g. Sharmaji Kitchen"></div>
+            <div class="form-group billed-input"><label>Total Bill Amount</label><input type="number" id="pRev" placeholder="₹ Total Billed"></div>
+            
+            <div class="form-group"><label>Aluminium Profile Cost</label><input type="number" id="cProfile" placeholder="0"></div>
+            <div class="form-group"><label>Glass Cost</label><input type="number" id="cGlass" placeholder="0"></div>
+            <div class="form-group"><label>Hardware / Connectors</label><input type="number" id="cHard" placeholder="0"></div>
+            <div class="form-group"><label>Labor Cost</label><input type="number" id="cLabor" placeholder="0"></div>
+            <div class="form-group"><label>Transport & Misc</label><input type="number" id="cTrans" placeholder="0"></div>
+
+            <button class="btn-calc" id="saveBtn" onclick="addProject()">Calculate & Send to Google Sheets</button>
+        </div>
+    </div>
+
+    <div class="project-list" id="projectList">
+        <h3 style="margin:0;">Recently Synced Projects</h3>
+        </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyc-H7zkyvOx4I4zvbyEsdkmDkRHLzf8L_zy9-PMje4Hk4Z3ZYvVnghzDZolnLW6nyI/exec";
+        let projects = JSON.parse(localStorage.getItem('cloud_projects')) || [];
+        updateUI();
+
+        function addProject() {
+            let name = document.getElementById('pName').value;
+            let revenue = parseFloat(document.getElementById('pRev').value) || 0;
+            let cProfile = parseFloat(document.getElementById('cProfile').value) || 0;
+            let cGlass = parseFloat(document.getElementById('cGlass').value) || 0;
+            let cHard = parseFloat(document.getElementById('cHard').value) || 0;
+            let cLabor = parseFloat(document.getElementById('cLabor').value) || 0;
+            let cTrans = parseFloat(document.getElementById('cTrans').value) || 0;
+
+            if(!name || revenue === 0) { alert("Enter Project Name and Billed Amount"); return; }
+
+            let totalCost = cProfile + cGlass + cHard + cLabor + cTrans;
+            let profit = revenue - totalCost;
+            let margin = ((profit / revenue) * 100).toFixed(1);
+
+            const btn = document.getElementById('saveBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving to Database...';
+            btn.disabled = true;
+
+            const payload = {
+                sheetName: "Project_Cost",
+                pName: name, pRev: revenue, cProfile: cProfile, cGlass: cGlass, 
+                cHard: cHard, cLabor: cLabor, cTrans: cTrans, 
+                totalCost: totalCost, profit: profit, margin: margin
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            }).then(response => {
+                projects.unshift(payload);
+                updateUI();
+                document.querySelectorAll('input').forEach(i => i.value = '');
+                btn.innerHTML = 'Calculate & Send to Google Sheets';
+                btn.disabled = false;
+            }).catch(error => {
+                alert("Error connecting to Google Sheets.");
+                btn.innerHTML = 'Calculate & Send to Google Sheets';
+                btn.disabled = false;
+            });
+        }
+
+        function updateUI() {
+            let container = document.getElementById('projectList');
+            container.innerHTML = "<h3 style='margin:0 0 10px 0;'>Recently Synced Projects</h3>";
+            projects.forEach(p => {
+                container.innerHTML += `
+                    <div class="project-card" style="border-left-color: ${p.profit >= 0 ? 'var(--green)' : 'var(--red)'}">
+                        <div class="p-info"><h4>${p.pName}</h4></div>
+                        <div style="display:flex;">
+                            <div class="stat-box"><label>Billed</label><div style="color:var(--primary)">₹${p.pRev}</div></div>
+                            <div class="stat-box"><label>Cost</label><div style="color:#666">₹${p.totalCost}</div></div>
+                            <div class="stat-box"><label>Profit</label><div style="color:${p.profit >= 0 ? 'var(--green)' : 'var(--red)'}">₹${p.profit}</div></div>
+                            <div class="stat-box"><label>Margin</label><div style="color:${p.profit >= 0 ? 'var(--green)' : 'var(--red)'}">${p.margin}%</div></div>
+                        </div>
+                    </div>`;
+            });
+            localStorage.setItem('cloud_projects', JSON.stringify(projects));
+        }
+    </script>
+</body>
+</html>
