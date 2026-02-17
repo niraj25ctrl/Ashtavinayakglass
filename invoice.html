@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Invoice | Shree Ashtavinayak</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #0288d1; --dark: #01579b; --light: #e1f5fe; --border: #cfd8dc; --white: #ffffff; }
+        body { background: #f5f7fa; font-family: 'Segoe UI', sans-serif; color: #333; margin: 0; padding: 20px; }
+        
+        .invoice-box { max-width: 800px; margin: auto; padding: 40px; border: 1px solid #eee; background: white; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); font-size: 16px; line-height: 24px; }
+        .header { display: flex; justify-content: space-between; align-items: start; border-bottom: 2px solid var(--primary); padding-bottom: 20px; margin-bottom: 20px; }
+        .logo h1 { margin: 0; color: var(--dark); font-size: 26px; text-transform: uppercase; }
+        .logo span { color: var(--primary); }
+        .logo p { margin: 2px 0; font-size: 13px; color: #555; }
+        .msme-badge { display: inline-block; background: var(--dark); color: white; padding: 4px 10px; font-size: 11px; border-radius: 4px; margin-top: 5px; font-weight: bold; }
+        
+        .invoice-title { text-align: right; }
+        .invoice-title h2 { margin: 0; color: var(--primary); font-size: 32px; letter-spacing: 1px;}
+        input[type="text"], input[type="number"], input[type="date"], textarea { border: 1px dashed #ccc; padding: 5px; font-family: inherit; color: #333; background: #fafafa; }
+        input:focus, textarea:focus { outline: none; border: 1px solid var(--primary); background: #fff; }
+
+        .invoice-meta { margin-top: 10px; text-align: right; }
+        .invoice-meta input { text-align: right; width: 120px; }
+
+        .details-row { display: flex; justify-content: space-between; margin-bottom: 30px; gap: 20px; }
+        .bill-to, .ship-to { flex: 1; }
+        .label { font-size: 12px; font-weight: bold; color: var(--dark); text-transform: uppercase; margin-bottom: 5px; display: block;}
+        .client-inputs input, .client-inputs textarea { width: 100%; margin-bottom: 5px; border: none; border-bottom: 1px dashed #ccc; background: transparent; }
+
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th { background: var(--dark); color: white; padding: 12px 10px; text-align: left; font-size: 13px; text-transform: uppercase; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        td input { width: 100%; border: none; background: transparent; font-size: 14px; }
+        .amount-col { text-align: right; font-weight: bold; }
+        .qty-col input, .rate-col input { width: 70px; text-align: center; background: #f9f9f9; border-radius: 4px;}
+
+        .totals { float: right; width: 300px; text-align: right; }
+        .total-row { padding: 5px 0; border-bottom: 1px solid #eee; }
+        .grand-total { font-size: 22px; font-weight: bold; color: var(--dark); border-top: 2px solid var(--dark); margin-top: 5px; padding-top: 10px; background: var(--light); padding: 10px; }
+
+        .footer-section { margin-top: 180px; font-size: 12px; color: #555; display: flex; justify-content: space-between; align-items: end; border-top: 1px solid #eee; padding-top: 20px; }
+        .bank-details { border: 1px solid var(--border); padding: 10px; border-radius: 5px; width: 50%; }
+        .signature { text-align: right; width: 40%; }
+        .signature-line { border-top: 1px solid #333; margin-top: 40px; width: 100%; display: block; }
+
+        .controls { max-width: 800px; margin: 0 auto 20px auto; text-align: right; display: flex; gap: 10px; justify-content: flex-end; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .btn-add { background: var(--light); color: var(--dark); }
+        .btn-print { background: var(--primary); color: white; }
+        .btn-delete { color: red; background: none; cursor: pointer; font-size: 14px;}
+
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .invoice-box { box-shadow: none; border: none; padding: 0; width: 100%; }
+            .controls, .btn-delete { display: none !important; }
+            input, textarea { border: none !important; background: transparent !important; resize: none; padding: 0; }
+            .qty-col input, .rate-col input { text-align: center; }
+            th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .grand-total, .msme-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button class="btn btn-add" onclick="addRow()"><i class="fas fa-plus"></i> Add Item</button>
+        <button class="btn btn-print" onclick="window.print()"><i class="fas fa-file-pdf"></i> Save as PDF</button>
+    </div>
+
+    <div class="invoice-box">
+        <div class="header">
+            <div class="logo">
+                <h1>Shree Ashtavinayak <span>Glass</span></h1>
+                <p>Motera, Ahmedabad, Gujarat - 382330</p>
+                <p>+91 9427101364 | contact@ashtavinayakglass.com</p>
+                <div class="msme-badge">MSME REGD: UDYAM-GJ-01-XXXXXXX</div>
+                <input type="text" placeholder="GSTIN: 24ABCDE1234F1Z5" style="display:block; margin-top:5px; font-size:12px; width:200px;">
+            </div>
+            <div class="invoice-title">
+                <h2>TAX INVOICE</h2>
+                <div class="invoice-meta">
+                    <div>Inv No: <input type="text" value="INV-2026-001"></div>
+                    <div>Date: <input type="date" id="dateField"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-row">
+            <div class="bill-to client-inputs">
+                <span class="label">Bill To:</span>
+                <input type="text" placeholder="Client / Company Name" style="font-weight: bold; font-size: 16px;">
+                <textarea placeholder="Address Line 1" rows="1"></textarea>
+                <textarea placeholder="City, State, Zip" rows="1"></textarea>
+                <input type="text" placeholder="Client GSTIN (Optional)">
+            </div>
+            <div class="ship-to client-inputs">
+                <span class="label">Ship To (If different):</span>
+                <textarea placeholder="Site Address / Delivery Location" rows="3"></textarea>
+            </div>
+        </div>
+
+        <table id="itemTable">
+            <thead>
+                <tr>
+                    <th style="width: 45%;">Description</th>
+                    <th style="width: 15%;">HSN/SAC</th>
+                    <th style="width: 10%;">Qty</th>
+                    <th style="width: 15%;">Rate (₹)</th>
+                    <th style="width: 15%; text-align: right;">Amount</th>
+                    <th style="width: 5%;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" placeholder="Item Name / Description"></td>
+                    <td><input type="text" placeholder="7604"></td>
+                    <td class="qty-col"><input type="number" value="1" oninput="calculateTotal()"></td>
+                    <td class="rate-col"><input type="number" value="0" oninput="calculateTotal()"></td>
+                    <td class="amount-col">0.00</td>
+                    <td><button class="btn-delete" onclick="deleteRow(this)"><i class="fas fa-trash"></i></button></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="totals">
+            <div class="total-row">Subtotal: <span id="subtotal">0.00</span></div>
+            <div class="total-row">
+                GST (<input type="number" value="18" style="width:30px; text-align:center;" oninput="calculateTotal()">%): 
+                <span id="gst">0.00</span>
+            </div>
+            <div class="total-row grand-total">Total: ₹ <span id="grandTotal">0.00</span></div>
+            <p style="font-size: 11px; font-style: italic;">(Amounts in INR)</p>
+        </div>
+
+        <div class="footer-section">
+            <div class="bank-details">
+                <span class="label" style="margin-bottom:5px;">Bank Details for NEFT/RTGS:</span>
+                <strong>Bank Name:</strong> <input type="text" placeholder="Your Bank" style="width:100px; border:none; font-weight:bold;"><br>
+                <strong>A/c Name:</strong> Shree Ashtavinayak Glass & Profile<br>
+                <strong>A/c No:</strong> <input type="text" placeholder="XXXXXXXXXXXX" style="width:150px; border:none;"><br>
+                <strong>IFSC Code:</strong> <input type="text" placeholder="XXXX000XXXX" style="width:100px; border:none;">
+            </div>
+            
+            <div class="signature">
+                <p>For, Shree Ashtavinayak Glass & Profile</p>
+                <br><br>
+                <span class="signature-line"></span>
+                <span style="font-size: 12px;">Authorized Signatory</span>
+            </div>
+        </div>
+        <p style="text-align: center; font-size: 10px; margin-top: 20px; color: #888;">
+            * Interest @24% PA will be charged if payment is not made within the stipulated time under MSME Act.
+        </p>
+    </div>
+
+    <script>
+        document.getElementById('dateField').valueAsDate = new Date();
+
+        function calculateTotal() {
+            let table = document.getElementById("itemTable");
+            let subtotal = 0;
+            let gstRate = document.querySelector('.total-row input').value;
+
+            for (let i = 1; i < table.rows.length; i++) {
+                let row = table.rows[i];
+                let qty = row.cells[2].getElementsByTagName("input")[0].value;
+                let rate = row.cells[3].getElementsByTagName("input")[0].value;
+                let amount = (qty * rate);
+                row.cells[4].innerText = amount.toFixed(2);
+                subtotal += amount;
+            }
+
+            let gstAmount = subtotal * (gstRate / 100);
+            document.getElementById("subtotal").innerText = subtotal.toFixed(2);
+            document.getElementById("gst").innerText = gstAmount.toFixed(2);
+            document.getElementById("grandTotal").innerText = (subtotal + gstAmount).toFixed(2);
+        }
+
+        function addRow() {
+            let table = document.getElementById("itemTable").getElementsByTagName('tbody')[0];
+            let newRow = table.insertRow(table.rows.length);
+            newRow.innerHTML = `
+                <td><input type="text" placeholder="Item Name / Description"></td>
+                <td><input type="text" placeholder="HSN"></td>
+                <td class="qty-col"><input type="number" value="1" oninput="calculateTotal()"></td>
+                <td class="rate-col"><input type="number" value="0" oninput="calculateTotal()"></td>
+                <td class="amount-col">0.00</td>
+                <td><button class="btn-delete" onclick="deleteRow(this)"><i class="fas fa-trash"></i></button></td>
+            `;
+        }
+
+        function deleteRow(btn) {
+            let row = btn.parentNode.parentNode;
+            let table = document.getElementById("itemTable").getElementsByTagName('tbody')[0];
+            if(table.rows.length > 1) {
+                row.parentNode.removeChild(row);
+                calculateTotal();
+            }
+        }
+    </script>
+</body>
+</html>
