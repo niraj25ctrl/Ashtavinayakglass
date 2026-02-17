@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Hub | Shree Ashtavinayak</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #0288d1; --dark: #01579b; --bg: #f0f4f8; --white: #ffffff; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); margin: 0; padding: 20px; color: #333; }
+        
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { color: var(--dark); margin-bottom: 5px; }
+        .header p { color: #666; margin: 0; }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hub-card {
+            background: var(--white);
+            padding: 30px 20px;
+            border-radius: 15px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: 0.3s;
+            border-top: 5px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hub-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(2, 136, 209, 0.2); }
+        .hub-card i { font-size: 40px; color: var(--primary); margin-bottom: 15px; }
+        .hub-card h3 { margin: 0 0 10px 0; font-size: 18px; color: var(--dark); }
+        .hub-card p { margin: 0; font-size: 13px; color: #666; }
+
+        .status-badge {
+            margin-top: 15px;
+            background: #e1f5fe;
+            color: var(--dark);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Shree Ashtavinayak Glass</h1>
+        <p>Master Business Dashboard</p>
+    </div>
+
+    <div class="grid-container">
+        
+        <a href="quote.html" class="hub-card">
+            <i class="fas fa-file-invoice"></i>
+            <h3>Quotation Generator</h3>
+            <p>Create and download PDF estimates for clients.</p>
+            <span class="status-badge">PDF Tool</span>
+        </a>
+
+        <a href="invoice.html" class="hub-card">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <h3>Tax Invoice Maker</h3>
+            <p>Generate MSME compliant tax invoices.</p>
+            <span class="status-badge">PDF Tool</span>
+        </a>
+
+        <a href="profit_manager.html" class="hub-card">
+            <i class="fas fa-chart-pie"></i>
+            <h3>Project Cost Analysis</h3>
+            <p>Track raw material, labor, and profit margins per site.</p>
+            <span class="status-badge"><i class="fas fa-cloud"></i> Cloud Sync</span>
+        </a>
+
+        <a href="accounts.html" class="hub-card">
+            <i class="fas fa-book"></i>
+            <h3>Daily Transactions</h3>
+            <p>Log daily income and expenses (Digital Rojmel).</p>
+            <span class="status-badge"><i class="fas fa-cloud"></i> Cloud Sync</span>
+        </a>
+
+    </div>
+
+</body>
+</html>
