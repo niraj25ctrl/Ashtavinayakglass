@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner CRM | Ashtavinayak Glass</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #0288d1; --dark: #01579b; --green: #10b981; --bg: #f3f4f6; --white: #ffffff; --orange: #f59e0b; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); margin: 0; padding: 15px; color: #333; padding-bottom: 80px; }
+
+        .header { background: var(--white); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .header h1 { margin: 0; color: var(--dark); font-size: 22px; }
+        .header p { margin: 0; color: #666; font-size: 13px; }
+
+        .dashboard { display: flex; gap: 10px; margin-bottom: 20px; }
+        .stat-box { flex: 1; background: var(--white); padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .stat-box h3 { margin: 0; font-size: 24px; color: var(--primary); }
+        .stat-box p { margin: 0; font-size: 11px; color: #666; font-weight: bold; text-transform: uppercase; }
+
+        .form-container { background: var(--white); padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: none; }
+        .form-container.active { display: block; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; color: var(--dark); margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; background: #fafafa; }
+        .form-group input:focus { border-color: var(--primary); outline: none; background: #fff; }
+
+        .btn-save { background: var(--dark); color: white; border: none; padding: 15px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
+        .btn-save:hover { background: var(--primary); }
+
+        .partner-list { display: grid; gap: 15px; }
+        .partner-card { background: var(--white); padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid #ccc; position: relative;}
+        
+        /* Status Colors */
+        .status-visited { border-left-color: #ccc; }
+        .status-interested { border-left-color: var(--orange); }
+        .status-placed { border-left-color: var(--green); }
+        
+        .p-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;}
+        .p-name { margin: 0; font-size: 18px; color: var(--dark); font-weight: bold; }
+        .p-area { font-size: 11px; background: #eee; padding: 3px 8px; border-radius: 10px; color: #555; }
+        
+        .p-details { font-size: 13px; color: #555; margin-bottom: 15px; line-height: 1.5; }
+        .p-details strong { color: #333; }
+
+        .p-actions { display: flex; gap: 10px; border-top: 1px solid #eee; padding-top: 10px; }
+        .p-actions select { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 12px; font-weight: bold; }
+        .btn-wa { background: #25D366; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 5px; border: none; cursor: pointer;}
+        .btn-delete { background: none; border: none; color: #ff4d4d; font-size: 16px; cursor: pointer; padding: 8px; }
+
+        .fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 5px 15px rgba(2, 136, 209, 0.4); cursor: pointer; border: none; z-index: 100;}
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Showroom Partner CRM</h1>
+        <p>Track your displays across Ahmedabad</p>
+    </div>
+
+    <div class="dashboard">
+        <div class="stat-box">
+            <h3 id="totalVisited">0</h3>
+            <p>Visited</p>
+        </div>
+        <div class="stat-box">
+            <h3 id="totalPlaced" style="color: var(--green);">0</h3>
+            <p>Displays Placed</p>
+        </div>
+    </div>
+
+    <div class="form-container" id="addForm">
+        <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">Add New Showroom</h3>
+        <div class="form-group"><label>Showroom Name</label><input type="text" id="sName" placeholder="e.g. Patel Hardware"></div>
+        <div class="form-group"><label>Owner / Contact Person</label><input type="text" id="oName" placeholder="e.g. Ramesh Bhai"></div>
+        <div class="form-group"><label>Phone Number</label><input type="number" id="phone" placeholder="9876543210"></div>
+        <div class="form-group"><label>Area / Location</label><input type="text" id="area" placeholder="e.g. SG Highway, SBR"></div>
+        <div class="form-group"><label>Display Pitched / Given</label>
+            <select id="displayType">
+                <option value="None Yet">None Yet</option>
+                <option value="Rose Gold Profile">Rose Gold Profile</option>
+                <option value="LED Smart Mirror">LED Smart Mirror</option>
+                <option value="Slim Glass Wardrobe">Slim Glass Wardrobe</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Status</label>
+            <select id="status">
+                <option value="visited">🆕 Visited (Thinking)</option>
+                <option value="interested">⏳ Highly Interested</option>
+                <option value="placed">✅ Display Placed</option>
+            </select>
+        </div>
+        <button class="btn-save" onclick="savePartner()">Save Showroom</button>
+        <button class="btn-save" style="background:#eee; color:#333; margin-top:10px;" onclick="toggleForm()">Cancel</button>
+    </div>
+
+    <div class="partner-list" id="partnerList">
+        </div>
+
+    <button class="fab" onclick="toggleForm()"><i class="fas fa-plus"></i></button>
+
+    <script>
+        let partners = JSON.parse(localStorage.getItem('crm_partners')) || [];
+
+        function toggleForm() {
+            document.getElementById('addForm').classList.toggle('active');
+            window.scrollTo(0, 0);
+        }
+
+        function savePartner() {
+            let sName = document.getElementById('sName').value;
+            let oName = document.getElementById('oName').value;
+            let phone = document.getElementById('phone').value;
+            let area = document.getElementById('area').value;
+            let displayType = document.getElementById('displayType').value;
+            let status = document.getElementById('status').value;
+
+            if(!sName || !phone) { alert("Showroom Name and Phone are required!"); return; }
+
+            let newPartner = { id: Date.now(), sName, oName, phone, area, displayType, status };
+            partners.unshift(newPartner);
+            localStorage.setItem('crm_partners', JSON.stringify(partners));
+            
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            toggleForm();
+            renderList();
+        }
+
+        function updateStatus(id, newStatus) {
+            let partner = partners.find(p => p.id === id);
+            if(partner) {
+                partner.status = newStatus;
+                localStorage.setItem('crm_partners', JSON.stringify(partners));
+                renderList();
+            }
+        }
+
+        function deletePartner(id) {
+            if(confirm("Are you sure you want to delete this showroom?")) {
+                partners = partners.filter(p => p.id !== id);
+                localStorage.setItem('crm_partners', JSON.stringify(partners));
+                renderList();
+            }
+        }
+
+        function sendFollowUp(phone, ownerName, showroomName) {
+            let cleanPhone = phone.replace(/[^0-9]/g, '');
+            if(cleanPhone.length === 10) cleanPhone = "91" + cleanPhone;
+
+            let message = `Hello ${ownerName} ji,\n\nNiraj here from Shree Ashtavinayak Glass & Profile (Motera).\n\nThank you for your time today at ${showroomName}. I am sharing our digital catalogue here for your reference: https://ashtavinayakglass.in/catalogue.html\n\nLooking forward to a great manufacturing partnership!`;
+            let url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        function renderList() {
+            const list = document.getElementById('partnerList');
+            list.innerHTML = '';
+            
+            let placedCount = 0;
+
+            if(partners.length === 0) {
+                list.innerHTML = `<p style="text-align:center; color:#888; margin-top:40px;">No showrooms added yet. Tap the + button to start.</p>`;
+            }
+
+            partners.forEach(p => {
+                if(p.status === 'placed') placedCount++;
+                
+                list.innerHTML += `
+                    <div class="partner-card status-${p.status}">
+                        <div class="p-header">
+                            <h3 class="p-name">${p.sName}</h3>
+                            <span class="p-area"><i class="fas fa-map-marker-alt"></i> ${p.area}</span>
+                        </div>
+                        <div class="p-details">
+                            <strong>Owner:</strong> ${p.oName} <br>
+                            <strong>Phone:</strong> ${p.phone} <br>
+                            <strong>Display:</strong> ${p.displayType}
+                        </div>
+                        <div class="p-actions">
+                            <select onchange="updateStatus(${p.id}, this.value)">
+                                <option value="visited" ${p.status === 'visited' ? 'selected' : ''}>🆕 Visited</option>
+                                <option value="interested" ${p.status === 'interested' ? 'selected' : ''}>⏳ Interested</option>
+                                <option value="placed" ${p.status === 'placed' ? 'selected' : ''}>✅ Display Placed</option>
+                            </select>
+                            <button class="btn-wa" onclick="sendFollowUp('${p.phone}', '${p.oName}', '${p.sName}')">
+                                <i class="fab fa-whatsapp"></i> Follow-up
+                            </button>
+                            <button class="btn-delete" onclick="deletePartner(${p.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('totalVisited').innerText = partners.length;
+            document.getElementById('totalPlaced').innerText = placedCount;
+        }
+
+        renderList();
+    </script>
+</body>
+</html>
